@@ -92,12 +92,15 @@
                     let vertices = []
 
 
-                    for(let i = 0; i <= xsegments; i++){
-                        let x = ( i * xsegmentSize ) - xhalfSize; //midpoint of mesh is 0,0
-                        for(let j = 0; j <= ysegments; j++){
-                            let y = (j * ysegmentSize) - yhalfSize;
-                            vertices.push( x, y, 0);
-                            heights.push(0); // make them flat again
+                    let ypow_max = Math.log(ysize);
+                    let ybase = Math.E;
+                    for (let i = 0; i <= xsegments; i ++ ) {
+                            let x = ( i * xsegmentSize ) - xhalfSize;
+                            for ( let j = 0; j <= ysegments; j ++ ) {
+                                let powr = (ysegments-j)/ysegments*ypow_max;
+                                let y = -Math.pow(ybase, powr) + yhalfSize + 1;
+                                vertices.push( x, y, 0);
+                                heights.push(0);
                         }
                     }
 
