@@ -22,6 +22,24 @@
 
     <script src="three.js"></script>
 
+    <script type="x-shader/x-vertex" id="vertexshader">
+        attribute float displacement;
+        uniform vec3 vLut[1];
+        varying vec3 vColor;
+        void main(){
+            vColor = vLut[0];
+            vec3 newPosition = position + normal*displacement/25.5;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentshader">
+        varying vec3 vColor;
+        void main(){
+            gl_FragColor = vec4(vColor,1.0);
+        }
+    </script>
+
     <script>
         "use strict";
         let frequency_samples = 512; //y resolution
@@ -58,11 +76,13 @@
                 for(let j = 0; j <= ysegments; j++){
                     let y = (j * ysegmentSize) - yhalfSize;
                     vertices.push(x,y,0);
-                    heights.push(0);
+                    heights.push(Math.random()*255.);
                 }
             }
 
             geometry.setAttribute( 'position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute( 'displacement', new THREE.Uint8BufferAttribute(heights,1));
+
 
             for(let i = 0; i < xsegments; i++){
                 for(let j = 0; j < ysegments; j++){
@@ -78,6 +98,20 @@
 
             geometry.setIndex(indices);
 
+            let string = [[0.5,0,0]]; // [R, G, B]
+            var lut = [];
+            for (let n=0;n<1;n++) {
+                lut.push(new THREE.Vector3((string[n][0]*255-49)/206., (string[n][1]*255-19)/236., (string[n][2]*255-50)/190.));
+            }
+
+            var vShader = document.getElementById('vertexshader');
+            var fShader = document.getElementById('fragmentshader');
+
+            var uniforms = {
+                vLut: {type: "v3v", value: lut}
+            }
+
+
             //renderizar y conectar con el DIV
             renderer = new THREE.WebGLRenderer ({antialias: true});
             renderer.setPixelRatio(window.devicePixelRatio);
@@ -85,10 +119,17 @@
             let container = document.getElementById('Spectrogram');
             container.appendChild(renderer.domElement);
 
-            let material = new THREE.MeshBasicMaterial({color: "#433F81"});
+            let material = new THREE.ShaderMaterial( {
+                uniforms: uniforms,
+                vertexShader:   vShader.text,
+                fragmentShader: fShader.text
+            } );
             mesh = new THREE.Mesh(geometry, material);
 
             scene.add(mesh);
+
+            mesh.geometry.computeFaceNormals();
+            mesh.geometry.computeVertexNormals();
 
             //render la escena
             renderer.render(scene, camera);
