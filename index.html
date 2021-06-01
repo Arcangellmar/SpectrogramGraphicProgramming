@@ -73,13 +73,15 @@
 
 
             for(let i = 0; i <= xsegments; i++){
-                let x = (i * xsegmentSize) - xhalfSize;
+                let x = ( i * xsegmentSize ) - xhalfSize; //midpoint of mesh is 0,0
                 for(let j = 0; j <= ysegments; j++){
                     let y = (j * ysegmentSize) - yhalfSize;
-                    vertices.push(x,y,0);
-                    heights.push(Math.random()*255.);
+                    vertices.push( x, y, 0);
+                    heights.push(0); // make them flat again
                 }
             }
+
+            heights = new Uint8Array(heights);
 
             geometry.setAttribute( 'position', new THREE.Float32BufferAttribute(vertices, 3));
             geometry.setAttribute( 'displacement', new THREE.Uint8BufferAttribute(heights,1));
@@ -132,8 +134,27 @@
             mesh.geometry.computeFaceNormals();
             mesh.geometry.computeVertexNormals();
 
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+            update_geometry();
             //render la escena
-            renderer.render(scene, camera);
+            renderer.render(scene, camera);				
+        }
+
+        function update_geometry() {
+            crypto.getRandomValues(DATA);
+            let start_val = frequency_samples+1;
+            let end_val = n_vertices -start_val;
+            heights.copyWithin(0, start_val, n_vertices+1);
+            heights.set(DATA, end_val-start_val);
+            mesh.geometry.setAttribute('displacement', new THREE.Uint8BufferAttribute(heights, 1));
         }
     </script>
 </body>
