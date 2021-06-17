@@ -18,5 +18,5 @@ In this project i used:
 
 You can run the project on the [web](https://spectrogramrolando.herokuapp.com/).
 
-![image proyect](https://github.com/Arcangellmar/SpectrogramGraphicProgramming/blob/images/Screenshot_1.jpg)
-![image proyect](https://github.com/Arcangellmar/SpectrogramGraphicProgramming/blob/images/Screenshot_2.jpg)
+![image proyect](https://github.com/Arcangellmar/SpectrogramGraphicProgramming/blob/master/images/Screenshot_1.jpg)
+![image proyect](https://github.com/Arcangellmar/SpectrogramGraphicProgramming/blob/master/images/Screenshot_2.jpg)
